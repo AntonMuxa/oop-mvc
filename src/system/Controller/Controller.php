@@ -3,8 +3,14 @@
 
 namespace system\Controller;
 
+use system\View\View;
 
-class Controller
+class AbstractController
 {
+    public $view;
 
+    public function __construct(View $view)
+    {
+        $this->view = $view;
+    }
 }

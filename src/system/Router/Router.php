@@ -3,37 +3,42 @@
 
 namespace system\Router;
 
+use system\View\View;
 
 class Router
 {
     public function parseUrl ()
     {
-        if(($pos = strpos($_SERVER['REQUEST_URI'], '?')) !== false){
-            $route = substr($_SERVER['REQUEST_URI'], 0, $pos);
+        $controller = 'main';
+        $action     = 'index';
+        $parts = explode('?', $_SERVER['REQUEST_URI']);
+        $uriParts = explode('/', $parts[0]);
+        if (!empty($uriParts[1])) {
+            $controller = $uriParts[1];
         }
-        $route = is_null($route) ? $_SERVER['REQUEST_URI'] : $route;
-        $route = explode('/', $route);
-        array_shift($route);
-        $result[0] = array_shift($route);
-        $result[1] = array_shift($route);
-        $result[2] = $route;
-        return $result;
+        if (!empty($uriParts[2])) {
+            $action = $uriParts[2];
+        }
+        return [
+            'controller' => $controller,
+            'action'     => $action
+        ];
     }
 
-    public function run() {
+    public function run(View $view) {
         $data = $this->parseUrl();
-        $controllerName = $data[0];
-        $action = $data[1];
+        $controllerName = $data['controller'];
+        $action = $data['action'];
 
         $controller = sprintf("Controller\\%s", ucfirst($controllerName));
-
         if (class_exists($controller)) {
-            $controller = new $controller('request', 'view');
+            $controller = new $controller($view);
             $response = $controller->$action();
             echo $response;
         } else {
-            //$controller = new NotFoundController($request, $view);
-            var_dump('error');
+            $controller = new \Controller\NotFound($view);
+            $response = $controller->$action();
+            echo $response;
         }
 
 
