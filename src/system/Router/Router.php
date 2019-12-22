@@ -1,6 +1,5 @@
 <?php
 
-
 namespace system\Router;
 
 use system\View\View;
@@ -25,7 +24,8 @@ class Router
         ];
     }
 
-    public function run(View $view) {
+    public function run(View $view)
+    {
         $data = $this->parseUrl();
         $controllerName = $data['controller'];
         $action = $data['action'];
